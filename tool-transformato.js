@@ -1,15 +1,17 @@
 /*** Módulo para trabajar con el sistema de archivos en la computadora. ***/
-const fs = require('fs');
+const fs = require('fs')
 
 /*** Modulo para las funciones de utilidad ***/
-const util = require('util');
+const util = require('util')
+const path = require('path')
+//const chardet = require('chardet')
 
 /*** Carpeta que contiene los archivos ***/
 //const carpeta = 'C:/Users/lapena/Documents/Luis Angel/Intelisis/SQL3100';
 const carpeta = 'Archivos'
 
 /*** Convierte la función callback-based a una Promise-based. ***/
-const leerCarpeta = util.promisify(fs.readdir);
+const leerCarpeta = util.promisify(fs.readdir)
 
 /***
  * Funcion asincrona que lee los archivos linea por linea.
@@ -17,40 +19,54 @@ const leerCarpeta = util.promisify(fs.readdir);
 ***/ 
 async function leerArchivosXLinea (archivo) {
   return new Promise(resolve => {
-    let texto = '';
-    const etiqueta = `Se leyo el archivo- ${archivo} y tardo`;
-    console.time(etiqueta);
-      const stream = fs.createReadStream(carpeta + '/' + archivo, {encoding: 'utf-8'});
+    let texto = ''
+    const etiqueta = `Se leyo el archivo- ${archivo} y tardo`
+    /*** Se comprueba la extension y dependiendo el resultado se usara el codificador*/
+    let extension = path.extname(archivo)
+    let codificacion;
+    if(!extension == '.sql')
+     {
+      codificacion = 'utf-8'
+    }
+     else{
+      codificacion = 'utf-16le'
+    }
+    console.time(etiqueta)
+    
+    //chardet.detectFile(carpeta + '/' + archivo, function(err, encodin) {
+      console.log('Codificacion antes de leer el archivo x linea:  ' + codificacion)
+      const stream = fs.createReadStream(carpeta + '/' + archivo, {encoding: codificacion})
       stream.on('data', data => {
-        texto += data;
-        stream.destroy();
+        texto += data
+        stream.destroy()
       });
       stream.on('close', () => {
-        transformar (texto, archivo)
-        console.timeEnd(etiqueta);
-        resolve();
-      });
-    //});
-  });
+        transformar (texto, archivo, codificacion)
+        console.timeEnd(etiqueta)
+        resolve()
+      })
+    //})
+  })
 }
 
 /***
  * Se ingresa la carpeta de archivos para extraerlos filtrando la terminacion .sql
  * @carpeta. - Ruta de la carpeta
 ***/
-function remplazar (texto, archivo) {
-  let writeStream = fs.createWriteStream(carpeta + '/' + archivo);
+function remplazar (texto, archivo, codificacion) {
+  console.log('Codifiacion recivida para remplazar el texto: ' + codificacion)
+  let writeStream = fs.createWriteStream(carpeta + '/' + archivo)
 
-  /*** Escribe el archivo***/
-  writeStream.write(texto);
+  /*** Escribe el archivo con la codificacion enviada***/
+  writeStream.write(texto, codificacion)
 
   /*** El evento final se emite cuando todos los datos se han vaciado del flujo ***/
   writeStream.on('finish', () => {  
-    console.log('Se escribio todo el documento');
-  });
+    console.log('Se escribio todo el documento')
+  })
 
   /*** Fin del Stream ***/ 
-  writeStream.end();  
+  writeStream.end()
 }
 
 /***
@@ -58,7 +74,7 @@ function remplazar (texto, archivo) {
  * @archivo. - archivo extraido de la ruta de la carpeta.
  * @texto. - cadena con el contenido del archivo
 ***/ 
-function transformar (texto, archivo) {
+function transformar (texto, archivo, codificacion) {
 
   /*** Quitar comentarios ***/
   texto = texto.replace(/(\/\*((\s+)(\n).*?|(\n).*?|.*?)(|(\s+)(\n).*?|(\n).*?)+(\*\/|\/\*.*?\*\/(.*(\n))+\*\/)|--.*)/gm,'')
@@ -77,9 +93,9 @@ function transformar (texto, archivo) {
    *Quita los espacios de mas entre las palabras reduciéndolos a 1 (incluye algunos caracteres especiales)
    *Quita los espacios del fin de la linea
   ***/ 
-  texto = texto.replace(/((?=\s(\@|\(|\=|\<|\>|\[|\]|\*|\.|\&|\,|\'|\-|\,\@|\]\(|\=\@|\(\@|\/|\+|\s\w+\+|\w+)))|((?=\n)|\s)/gm, '')
+  texto = texto.replace(/((?=\s(\@|\(|\=|\<|\>|\[|\]|\*|\.|\&|\,|\'|\-|\,\@|\]\(|\#|\=\@|\(\@|\/|\+|\s\w+\+|\w+)))|((?=\n)|\s)/gm, '')
   
-  remplazar(texto, archivo)
+  remplazar(texto, archivo, codificacion)
 }
 
 /***
@@ -90,7 +106,7 @@ async function procesarArchivos(archivos) {
   for (let archivo of archivos) {
     console.log('Archivo leido en procesar:  ' + archivo);
     /*** Await permite entrar en fase de espera continuando con la funcionalidad ***/
-    await leerArchivosXLinea(archivo);
+    await leerArchivosXLinea(archivo)
   }
 }
 
@@ -102,5 +118,5 @@ async function procesarArchivos(archivos) {
 ***/
 leerCarpeta(carpeta).then(archivos => {
   procesarArchivos(archivos.filter(archivo => /.\.sql|\.vis|\.frm|\.esp|\.tbl|\.rep|\.dlg$/i.test(archivo)))
-  //procesarArchivos(archivos);
+  //procesarArchivos(archivos)
 });
