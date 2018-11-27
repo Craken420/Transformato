@@ -52,7 +52,8 @@ function remplazar (texto, archivo, codificacion) {
 }
 
 function transformar (texto, archivo, codificacion) {
-  texto = texto.replace(/(\/\*((\s+)(\n).*?|(\n).*?|.*?)(|(\s+)(\n).*?|(\n).*?)+(\*\/|\/\*.*?\*\/(.*(\n))+\*\/)|--.*)/gm,'')
+  texto = texto.replace(/(\/\*((\n.*)+\*\/|(\s+)(\n).*?|(\n).*?|.*?)(|(\s+)(\n).*?))/gm,'')
+  texto = texto.replace(/.\-+/gm,'')
   texto = texto.replace(/with\(nolock\)|with \(nolock\)/mig,'')
   texto = texto.replace(/with\(rowlock\)|with \(rowlock\)/mig,'')
   texto = texto.replace(/((?=[\ \t])|^\s+|$)+/mg,'')
