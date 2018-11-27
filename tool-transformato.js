@@ -1,9 +1,12 @@
 const fs = require('fs')
 const util = require('util')
 const path = require('path')
+var replaceExt = require('replace-ext')
 //const chardet = require('chardet')
-//const carpeta = 'C:/Users/lapena/Documents/Luis Angel/Intelisis/SQL3100';
-const carpeta = 'Archivos'
+const carpeta = 'C:/Users/lapena/Documents/Luis Angel/Intelisis/SQL3100';
+const nuevaCarpeta = 'C:/Users/lapena/Documents/Luis Angel/Intelisis/NuevoSQL3100'
+//const carpeta = 'Archivos'
+//const nuevaCarpeta = 'ArchivosTransformados'
 const leerCarpeta = util.promisify(fs.readdir)
 
 async function leerArchivosXLinea (archivo) {
@@ -13,35 +16,36 @@ async function leerArchivosXLinea (archivo) {
     let extension = path.extname(archivo)
     let codificacion;
     if(!extension == '.sql')
-     {
+    {
       codificacion = 'utf-8'
     }
-     else{
+    else{
       codificacion = 'utf-16le'
     }
     console.time(etiqueta)
     
     //chardet.detectFile(carpeta + '/' + archivo, function(err, encodin) {
-      console.log('Codificacion antes de leer el archivo x linea:  ' + codificacion)
-      const stream = fs.createReadStream(carpeta + '/' + archivo, {encoding: codificacion})
-      stream.on('data', data => {
-        texto += data
-        stream.destroy()
-      });
-      stream.on('close', () => {
-        transformar (texto, archivo, codificacion)
-        console.timeEnd(etiqueta)
-        resolve()
-      })
+    console.log('Codificacion antes de leer el archivo x linea:  ' + codificacion)
+    const stream = fs.createReadStream(carpeta + '/' + archivo, {encoding: codificacion})
+    stream.on('data', data => {
+      texto += data
+      stream.destroy()
+    })
+    stream.on('close', () => {
+      transformar (texto, archivo, codificacion)
+      console.timeEnd(etiqueta)
+      resolve()
+    })
     //})
   })
 }
 
 function remplazar (texto, archivo, codificacion) {
   console.log('Codifiacion recivida para remplazar el texto: ' + codificacion)
-  let writeStream = fs.createWriteStream(carpeta + '/' + archivo)
+  var nuevaRuta = replaceExt(archivo, '.txt');
+  let writeStream = fs.createWriteStream(nuevaCarpeta + '/' + nuevaRuta)
   writeStream.write(texto, codificacion)
-  writeStream.on('finish', () => {  
+  writeStream.on('finish', () => {
     console.log('Se escribio todo el documento')
   })
   writeStream.end()
