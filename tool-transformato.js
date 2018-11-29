@@ -18,14 +18,16 @@ fq.readdir(carpeta, function(err, files) {
               } else {
                 texto = data
               }
-              texto = texto.replace(/\/(\*)+([^*]*(?:\*(?!)[^*]*)*(\*+)(\/))/gm,'')
-              texto = texto.replace(/\/(\*)+([^*]*(?:\*(?!)[^*]*)*(\*+)(\/))/gm,'')
+              texto = texto.replace(/\/(\*)+(|\n+.*)([^*]*(?:\*(?!)[^*]*)*(\*+)(\/))/gm,'')
+              texto = texto.replace(/\/\*(\n+|\s+|\s+\n+|)(.*?|.*?(\n+.*?)+)\*\//gm,'')
+              texto = texto.replace(/\/(\*)+(|\n+)([^*]*(?:\*(?!\*)[^*]*)*(\*+)(\/))/gm,'')
               texto = texto.replace(/\-\-+.*/gm,'')
               texto = texto.replace(/with\(nolock\)|with \(nolock\)/mig,'')
               texto = texto.replace(/with\(rowlock\)|with \(rowlock\)/mig,'')
               texto = texto.replace(/((?=[\ \t])|^\s+|$)+/mg,'')
               texto = texto.replace(/\t/mg,' ')
-              texto = texto.replace(/((?=\s(\@|\(|\=|\<|\>|\[|\]|\*|\.|\&|\,|\'|\-|\,\@|\]\(|\#|\=\@|\(\@|\/|\+|\s\w+\+|\w+)))|((?=\n)|\s)/gm, '') 
+              texto = texto.replace(/((?=\s(\@|\(|\=|\<|\>|\[|\]|\*|\.|\&|\,|\'|\-|\,\@|\]\(|\#|\=\@|\(\@|\/|\+|\s\w+\+|\w+)))|((?=\n)|\s)/gm, '')
+              
               fq.writeFile(nuevaCarpeta+file, texto, 'utf-16le', function (err) {
                   
                 if (err) {
