@@ -1,71 +1,63 @@
-const fs = require('fs')
+const carpeta = 'Archivos/'
 const util = require('util')
-const path = require('path')
-//const chardet = require('chardet')
-
-//const carpeta = 'C:/Users/lapena/Documents/Luis Angel/Intelisis/SQL3100';
-const carpeta = 'Archivos'
+const fs = require('fs')
+const replaceExt = require('replace-ext')
 const leerCarpeta = util.promisify(fs.readdir)
+let texto = ''
 
-async function leerArchivosXLinea (archivo) {
-  return new Promise(resolve => {
-    let texto = ''
-    const etiqueta = `Se leyo el archivo- ${archivo} y tardo`
-    let extension = path.extname(archivo)
-    let codificacion;
-    if(!extension == '.sql')
-     {
-      codificacion = 'utf-8'
-    }
-     else{
-      codificacion = 'utf-16le'
-    }
-    console.time(etiqueta)
-    
-    //chardet.detectFile(carpeta + '/' + archivo, function(err, encodin) {
-      console.log('Codificacion antes de leer el archivo x linea:  ' + codificacion)
-      const stream = fs.createReadStream(carpeta + '/' + archivo, {encoding: codificacion})
-      stream.on('data', data => {
-        texto += data
-        stream.destroy()
-      });
-      stream.on('close', () => {
-        transformar (texto, archivo, codificacion)
-        console.timeEnd(etiqueta)
-        resolve()
-      })
-    //})
+var readline = require('readline');
+var stream = require('stream');
+
+function leerArchivosXLinea (file){
+  
+  var instream = fs.createReadStream(carpeta+file, {encoding: 'utf-16le'});
+  var outstream = new stream;
+  var readStream = readline.createInterface(instream, outstream);
+  readStream.on('line', function(line){
+      texto += line + '\n'
   })
+  readStream.on('close', () => {
+    transformar (texto, file)
+  });
+ 
 }
 
-function remplazar (texto, archivo, codificacion) {
-  console.log('Codifiacion recivida para remplazar el texto: ' + codificacion)
-  let writeStream = fs.createWriteStream(carpeta + '/' + archivo)
-  writeStream.write(texto, codificacion)
-  writeStream.on('finish', () => {  
-    console.log('Se escribio todo el documento')
-  })
-  writeStream.end()
+function remplazar (texto, file) {
+  console.log('Se remplazara')
+  var nuevaRuta = replaceExt(file, '.txt');
+  fs.writeFile(carpeta+'/'+nuevaRuta, texto, {encoding: 'utf-16le'},function (err) { 
+    if (err) return console.log(err);
+  }); 
 }
 
-function transformar (texto, archivo, codificacion) {
-  texto = texto.replace(/(\/\*((\s+)(\n).*?|(\n).*?|.*?)(|(\s+)(\n).*?|(\n).*?)+(\*\/|\/\*.*?\*\/(.*(\n))+\*\/)|--.*)/gm,'')
+function transformar (texto, archivo) {
+  texto = texto.replace(/\/(\*)+([^*]*(?:\*(?!)[^*]*)*(\*+)(\/))/gm,'')
+  texto = texto.replace(/\/(\*)+([^*]*(?:\*(?!)[^*]*)*(\*+)(\/))/gm,'')
+  texto = texto.replace(/\-\-+.*/gm,'')
   texto = texto.replace(/with\(nolock\)|with \(nolock\)/mig,'')
   texto = texto.replace(/with\(rowlock\)|with \(rowlock\)/mig,'')
   texto = texto.replace(/((?=[\ \t])|^\s+|$)+/mg,'')
   texto = texto.replace(/\t/mg,' ')
-  texto = texto.replace(/((?=\s(\@|\(|\=|\<|\>|\[|\]|\*|\.|\&|\,|\'|\-|\,\@|\]\(|\#|\=\@|\(\@|\/|\+|\s\w+\+|\w+)))|((?=\n)|\s)/gm, '')
-  remplazar(texto, archivo, codificacion)
+  texto = texto.replace(/((?=\s(\@|\(|\=|\<|\>|\[|\]|\*|\.|\&|\,|\'|\-|\,\@|\]\(|\#|\=\@|\(\@|\/|\+|\s\w+\+|\w+)))|((?=\n)|\s)/gm, '') 
+  remplazar(texto, archivo)
 }
 
+/***
+ * Funcion asincrona que procesa los archivos.
+ * @archivos. - archivos extraidos de la ruta de la carpeta.
+***/ 
 async function procesarArchivos(archivos) {
   for (let archivo of archivos) {
-    console.log('Archivo leido en procesar:  ' + archivo);
-    await leerArchivosXLinea(archivo)
+    console.log(archivo);
+    await leerArchivosXLinea(archivo);
   }
 }
 
+/***
+ * Se ingresa la carpeta de archivos para extraerlos filtrando la terminacion .sql
+ * @carpeta. - uta de la carpeta.
+***/
 leerCarpeta(carpeta).then(archivos => {
-  procesarArchivos(archivos.filter(archivo => /.\.sql|\.vis|\.frm|\.esp|\.tbl|\.rep|\.dlg$/i.test(archivo)))
-  //procesarArchivos(archivos)
-});
+  //procesarArchivos(archivos.filter(archivo => /.\.sql/.test(archivo)));
+  procesarArchivos(archivos);
+})
