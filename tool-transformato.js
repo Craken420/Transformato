@@ -20,7 +20,6 @@ fq.readdir(carpeta, function (err, files) {
       texto= texto.replace(/\/\*([^*]*)(|(([*]+[^*]+)*?))\*\//g, '')
       texto = texto.replace(/(\-\-+).*/gm,'')
       texto = texto.replace(/with\(nolock\)|with \(nolock\)/mig, '')
-      texto= texto.replace(/\/(\*)+(|\n+.*)([^*]*(?:\*(?!)[^*]*)*(\*+)(\/))/g, '')
       texto = texto.replace(/with\(rowlock\)|with \(rowlock\)/mig, '')
       texto = texto.replace(/((?=[\ \t])|^\s+|$)+/mg, '')
       texto = texto.replace(/\t/mg, ' ')
