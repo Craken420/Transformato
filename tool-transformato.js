@@ -17,7 +17,6 @@ fq.readdir(carpeta, function (err, files) {
       } else {
         texto = data
       }
-      //Nuevas Reg Ex
       texto= texto.replace(/\/(\*)+(|\n+.*)([^*]*(?:\*(?!)[^*]*)*(\*+)(\/))/g, '')
       texto= texto.replace(/\/\*([^*]*)(|[*]+|(([*]+[^*]+)*?))\*\//g, '')
       texto = texto.replace(/(\-\-+).*/gm,'')
