@@ -17,18 +17,7 @@ fq.readdir(carpeta, function (err, files) {
       } else {
         texto = data
       }
-      //Nuevas Reg Ex
-      //texto= texto.replace(/\/(\*)+(|\n+.*)([^*]*(?:\*(?!)[^*]*)*(\*+)(\/))/g, '')
-      //texto= texto.replace(/\/\*([^*]*)(|[*]+|([*]+[^*]*))?\*\//g, '')
-      //texto= texto.replace(/\/\*(\s+|\n+|\s+\n+|).*?(|[^*])(|(\n.*?)+)\*\//g, '')
-      texto= texto.replace(/\/\*([^*]*)(|[*]+|(([*]+[^*]+)*?))\*\//g, '')
-      //Viejas reg ex
-      //Quita los comentarios mas sencillos
-      //texto = texto.replace(/\/\*(\n+|\s+|\s+\n+|)(.*?|.*?(\n+.*?)+)\*\//gm, '')
-      //texto = texto.replace(/\/(\*)+(|\n+.*)([^*]*(?:\*(?!)[^*]*)*(\*+)(\/))/gm, '')
-      //texto = texto.replace(/\/\*(\n+|\s+|\s+\n+|)(.*?|.*?(\n+.*?)+)\*\//gm, '')
-      /** Super duper */
-      //texto = texto.replace(/\/(\*)+(|\n+)([^*]*(?:\*(?!\*)[^*]*)*(\*+)(\/))/gm, '')
+      texto= texto.replace(/\/\*([^*]*)(|(([*]+[^*]+)*?))\*\//g, '')
       texto = texto.replace(/(\-\-+).*/gm,'')
       texto = texto.replace(/with\(nolock\)|with \(nolock\)/mig, '')
       texto= texto.replace(/\/(\*)+(|\n+.*)([^*]*(?:\*(?!)[^*]*)*(\*+)(\/))/g, '')
