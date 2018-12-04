@@ -7,24 +7,24 @@ const carpeta= 'Archivos/'
 const nuevaCarpeta= 'ArchivosNEW/'
 //const carpeta = 'C:/Users/lapena/Documents/Luis Angel/Intelisis/SQL3100/'
 //const nuevaCarpeta = 'C:/Users/lapena/Documents/Luis Angel/Intelisis/NuevoSQL3100/'
+let contador = 1
 
-
-function comrprobar (carpeta, archivos) {
-  archivos.map(function(archivo) {
+function comprobar (carpeta, archivos) {
+  let archivosFiltrados = filtrarExtension(archivos)
+  archivosFiltrados.map(function(archivo) {
     return path.join(process.cwd(), carpeta, archivo)
   }).filter(function(archivo) {
     return fs.statSync(archivo).isFile()
   }).forEach(function(archivo) {
-    //filtrarExtension(archivos)
-    let codificacionFinal = detectarCodificacion(carpeta, archivo)
-    let contenido = leerArchivo(carpeta, archivo, codificacionFinal)
-    remplazarTexto(nuevaCarpeta, archivo, transformar(contenido), codificacionFinal)
+    let codificacionFinal = detectarCodificacion(archivo)
+    let contenido = leerArchivo(archivo, codificacionFinal)
+    remplazarTexto(archivo, transformar(contenido), codificacionFinal)
   })
 }
 
-function leerArchivo (carpeta, archivo, codificacionFinal) {
+function leerArchivo (archivo, codificacionFinal) {
   let texto = ''
-  fq.readFile(carpeta + archivo, codificacionFinal, function(err, data) {
+  fq.readFile(archivo, codificacionFinal, function(err, data) {
     if (err) {
       console.log('error: ', err)
     } else {
@@ -34,7 +34,7 @@ function leerArchivo (carpeta, archivo, codificacionFinal) {
   return texto
 }
 
-function transformar () {
+function transformar (texto) {
   texto = texto.replace(/\/(\*)+(|\n+.*)([^*]*(?:\*(?!)[^*]*)*(\*+)(\/))/g, '')
   texto = texto.replace(/\/\*([^*]*)(|[*]+|(([*]+[^*]+)*?))\*\//g, '')
   texto = texto.replace(/(\-\-+).*/gm, '')
@@ -47,29 +47,27 @@ function transformar () {
   return texto
 }
 
-function remplazarTexto (nuevaCarpeta, archivo, contenido, codificacionFinal) {
-  fq.writeFile(nuevaCarpeta+archivo, transformar(contenido), c, function(err) {
+function remplazarTexto (archivo, contenido, codificacionFinal) {
+  fq.writeFile(nuevaCarpeta+archivo.replace(/.*?(\\\w+)+\\/g, ''), transformar(contenido), codificacionFinal, function(err) {
     if (err) {
       return console.log(err)
     }
-    console.log(contador++ +'.- ' + archivo + ' - CODIFICACION INICIAL: ' + 
-      codificacionInicial + ' - CODIFICACION FINAL: ' + codificacionFinal + ' ...¡Guardado!')
+    console.log(contador++ +'.- ' + archivo.replace(/.*?(\\\w+)+\\/g, '') + ' - CODIFICACION FINAL: ' + codificacionFinal + ' ...¡Guardado!')
   })
 }
 
 
-function detectarCodificacion (carpeta, archivo) {
-  if (comprobar(archivo) == 'Archivo') {
-    let codificacionInicial = chardet.detectFileSync(carpeta + archivo)
-    if (codificacionInicial == 'ISO-8859-1' | codificacionInicial == 'ISO-8859-2' | codificacionInicial == 'ISO-8859-9') {
-      return 'ASCII'
-    } else if (codificacionInicial == 'UTF-8') {
-      return 'UTF-8' 
-    } else if (codificacionInicial == 'UTF-16LE') {
-      return 'UTF-16LE' 
-    } else {
-      return codificacionInicial
-    }
+function detectarCodificacion (archivo) {
+  let codificacionInicial = ''
+  codificacionInicial  = chardet.detectFileSync(archivo)
+  if (codificacionInicial == 'ISO-8859-1' | codificacionInicial == 'ISO-8859-2' | codificacionInicial == 'ISO-8859-9') {
+    return 'ASCII'
+  } else if (codificacionInicial == 'UTF-8') {
+    return 'UTF-8' 
+  } else if (codificacionInicial == 'UTF-16LE') {
+    return 'UTF-16LE' 
+  } else {
+    return codificacionInicial
   }
 }
 
@@ -79,5 +77,5 @@ function filtrarExtension (archivos) {
 
 fs.readdir(carpeta, function(error, archivos) {
   if (error) throw error
-  comrprobar(carpeta, archivos)
+  comprobar(carpeta, archivos)
 })
