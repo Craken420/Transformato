@@ -57,6 +57,3 @@ fs.readdir(carpeta, function (err, files) {
    })
   
 })
-
-
-
