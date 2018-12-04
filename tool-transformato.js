@@ -9,7 +9,7 @@ fq.readdir(carpeta, function (err, files) {
   if (err) {
     throw err
   }
-  let counter = 0
+  let counter = 1
   files.forEach(function (file) {
     let texto = ''
     let codi=''
@@ -24,7 +24,7 @@ fq.readdir(carpeta, function (err, files) {
         console.log('utf-8 Codificacion:  '+codificacion + '   Codi:  ' + codi)
      } else if (codificacion == 'UTF-16LE'){
      
-        codi='UTF-16LE' 
+        codi='utf-16le' 
         console.log('utf16Le Codificacion:  '+codificacion + '   Codi:  ' + codi)
      } else {
       
@@ -35,7 +35,6 @@ fq.readdir(carpeta, function (err, files) {
       if (err) {
         console.log('error: ', err)
       } else {
-        console.log('Se leeyo el archivo CON LA CODIFICACION:   ' + codi + '  *************')
         texto = data
       }
       texto= texto.replace(/\/(\*)+(|\n+.*)([^*]*(?:\*(?!)[^*]*)*(\*+)(\/))/g, '')
@@ -51,7 +50,7 @@ fq.readdir(carpeta, function (err, files) {
         if (err) {
           return console.log(err)
         }
-        console.log("The file was saved!" + counter++ + ' CON LA CODIFICACION:   ' + codi + '  *************')
+        console.log("The file was saved!" + counter++ + ' CON LA CODIFICACION:   ' + codificacion + ' y la CODI: '+codi+'*************')
       })
     })
   })
