@@ -15,7 +15,7 @@ function comprobar (carpeta, archivos) {
   filtrarExtension(archivos).map(function(archivo) {
     return path.join(carpeta, archivo)
   }).filter(function(archivo) {
-    console.log('Filtrando contenido:  ' + contador1++)
+    console.log('Filtrando contenido del archivo No. ' + contador1++)
     return fs.statSync(archivo).isFile()
   }).forEach(function(archivo) {
     leerArchivo(archivo, detectarCodificacion(archivo))
@@ -68,7 +68,7 @@ function codificarASCII (codificacionInicial) {
 }
 
 function detectarCodificacion (archivo) {
-  console.log('Detectando codificacion '+ contador++)
+  console.log('Detectando codificacion del archivo No. '+ contador++)
   let codificacionInicial = ''
   codificacionInicial  = chardet.detectFileSync(archivo)
   if (codificarASCII(codificacionInicial) == true) {
