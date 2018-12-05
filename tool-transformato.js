@@ -53,12 +53,12 @@ function remplazarTexto (archivo, texto, codificacionFinal) {
     if (err) {
       return console.log(err)
     }
-    console.log(contador++ + '.- ' + archivo.replace(/(|.*?)(\\\w+)+\\|\w+\\/g, '')+' CODIFICACION:   ' + codificacionFinal +'*************')
+    console.log(contador++ + '.- CODIFICACION: ' + codificacionFinal + '  --  ' + archivo.replace(/(|.*?)(\\\w+)+\\|\w+\\/g, ''))
   })
 }
 
 function codificarASCII (codificacionInicial) {
-  for(let i = 0; i<codificaciones.length; i++) {
+  for(let i = 0; i < codificaciones.length; i++) {
     if (codificacionInicial == codificaciones[i]) {
       return true
     } else {
