@@ -7,21 +7,18 @@ const fq = new Filequeue(1000)   // Maximo de numero de archivos abiertos a la v
 //const nuevaCarpeta= 'ArchivosNEW/'
 const carpeta = 'C:/Users/lapena/Documents/Luis Angel/Intelisis/SQL3100/'
 const nuevaCarpeta = 'C:/Users/lapena/Documents/Luis Angel/Intelisis/NuevoSQL3100/'
+const codificaciones = ['ISO-8859-1','ISO-8859-2','ISO-8859-3','ISO-8859-4','ISO-8859-5','ISO-8859-6','ISO-8859-7','ISO-8859-8','ISO-8859-9']
 let contador = 1
 
 function comprobar (carpeta, archivos) {
-  let contador1=1
-  let contador2=1
-  let archivosFiltrados = filtrarExtension(archivos)
-  archivosFiltrados.map(function(archivo) {
+  let contador1 = 1
+  filtrarExtension(archivos).map(function(archivo) {
     return path.join(carpeta, archivo)
   }).filter(function(archivo) {
-    console.log('Filtrando contenido:  '+ contador1++ )
+    console.log('Filtrando contenido:  ' + contador1++)
     return fs.statSync(archivo).isFile()
   }).forEach(function(archivo) {
-    console.log('Detectando codificacion '+ contador2++)
-    let codificacionFinal = detectarCodificacion(archivo)
-     leerArchivo(archivo, codificacionFinal)
+    leerArchivo(archivo, detectarCodificacion(archivo))
   })
 }
 
@@ -51,22 +48,34 @@ function transformar (texto) {
 }
 
 function remplazarTexto (archivo, texto, codificacionFinal) {
+  contador = 0
   fq.writeFile(nuevaCarpeta+archivo.replace(/(|.*?)(\\\w+)+\\|\w+\\/g, ''), transformar(texto), codificacionFinal, function (err) {
     if (err) {
       return console.log(err)
     }
-    console.log(contador++ + '.- ' + archivo.replace(/(|.*?)(\\\w+)+\\|\w+\\/g, '')+' CON LA CODIFICACION:   ' + codificacionFinal +'*************')
+    console.log(contador++ + '.- ' + archivo.replace(/(|.*?)(\\\w+)+\\|\w+\\/g, '')+' CODIFICACION:   ' + codificacionFinal +'*************')
   })
 }
 
+function codificarASCII (codificacionInicial) {
+  for(let i = 0; i<codificaciones.length; i++) {
+    if (codificacionInicial == codificaciones[i]) {
+      return true
+    } else {
+      return false
+    }
+  }
+}
+
 function detectarCodificacion (archivo) {
+  console.log('Detectando codificacion '+ contador++)
   let codificacionInicial = ''
   codificacionInicial  = chardet.detectFileSync(archivo)
-  if (codificacionInicial == 'ISO-8859-1' | codificacionInicial == 'ISO-8859-2' | codificacionInicial == 'ISO-8859-9') {
+  if (codificarASCII(codificacionInicial) == true) {
     return 'ASCII'
   } else if (codificacionInicial == 'UTF-8') {
     return 'UTF-8' 
-  } else if (codificacionInicial == 'UTF-16LE') {
+  } else if (codificacionInicial == 'UTF-16LE' | codificacionInicial == 'UTF-32LE') {
     return 'UTF-16LE' 
   } else {
     return codificacionInicial
