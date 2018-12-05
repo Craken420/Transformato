@@ -1,0 +1,6 @@
+[ActivoFijo.tbl/FechaEmision]
+CondicionEdicion=1=2
+
+[ActivoFijo.tbl/Personal]
+AyudaIgnoraChequeos=S
+ValidacionConCondiciones=N

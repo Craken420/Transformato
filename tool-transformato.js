@@ -3,22 +3,25 @@ const path = require('path')
 const chardet = require('chardet')
 const Filequeue = require('filequeue')
 const fq = new Filequeue(1000)   // Maximo de numero de archivos abiertos a la vez
-const carpeta= 'Archivos/'
-const nuevaCarpeta= 'ArchivosNEW/'
-//const carpeta = 'C:/Users/lapena/Documents/Luis Angel/Intelisis/SQL3100/'
-//const nuevaCarpeta = 'C:/Users/lapena/Documents/Luis Angel/Intelisis/NuevoSQL3100/'
+//const carpeta= 'Archivos/'
+//const nuevaCarpeta= 'ArchivosNEW/'
+const carpeta = 'C:/Users/lapena/Documents/Luis Angel/Intelisis/SQL3100/'
+const nuevaCarpeta = 'C:/Users/lapena/Documents/Luis Angel/Intelisis/NuevoSQL3100/'
 let contador = 1
 
 function comprobar (carpeta, archivos) {
+  let contador1=1
+  let contador2=1
   let archivosFiltrados = filtrarExtension(archivos)
   archivosFiltrados.map(function(archivo) {
-    return path.join(process.cwd(), carpeta, archivo)
+    return path.join(carpeta, archivo)
   }).filter(function(archivo) {
+    console.log('Filtrando contenido:  '+ contador1++ )
     return fs.statSync(archivo).isFile()
   }).forEach(function(archivo) {
+    console.log('Detectando codificacion '+ contador2++)
     let codificacionFinal = detectarCodificacion(archivo)
-    let contenido = leerArchivo(archivo, codificacionFinal)
-    remplazarTexto(archivo, transformar(contenido), codificacionFinal)
+     leerArchivo(archivo, codificacionFinal)
   })
 }
 
@@ -30,8 +33,8 @@ function leerArchivo (archivo, codificacionFinal) {
     } else {
       texto = data
     }
+    remplazarTexto(archivo, texto, codificacionFinal)
   })
-  return texto
 }
 
 function transformar (texto) {
@@ -47,15 +50,14 @@ function transformar (texto) {
   return texto
 }
 
-function remplazarTexto (archivo, contenido, codificacionFinal) {
-  fq.writeFile(nuevaCarpeta+archivo.replace(/.*?(\\\w+)+\\/g, ''), transformar(contenido), codificacionFinal, function(err) {
+function remplazarTexto (archivo, texto, codificacionFinal) {
+  fq.writeFile(nuevaCarpeta+archivo.replace(/(|.*?)(\\\w+)+\\|\w+\\/g, ''), transformar(texto), codificacionFinal, function (err) {
     if (err) {
       return console.log(err)
     }
-    console.log(contador++ +'.- ' + archivo.replace(/.*?(\\\w+)+\\/g, '') + ' - CODIFICACION FINAL: ' + codificacionFinal + ' ...¡Guardado!')
+    console.log(contador++ + '.- ' + archivo.replace(/(|.*?)(\\\w+)+\\|\w+\\/g, '')+' CON LA CODIFICACION:   ' + codificacionFinal +'*************')
   })
 }
-
 
 function detectarCodificacion (archivo) {
   let codificacionInicial = ''
@@ -77,5 +79,6 @@ function filtrarExtension (archivos) {
 
 fs.readdir(carpeta, function(error, archivos) {
   if (error) throw error
+  console.log('Cargando espera...')
   comprobar(carpeta, archivos)
 })
