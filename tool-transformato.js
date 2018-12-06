@@ -43,7 +43,7 @@ function transformar (texto) {
   texto = texto.replace(/\/(\*+)([^*]*)(|[*]+|(([*]+[^*]+)*?))(\*+)\//g, '')
   texto = texto.replace(/(\-\-+).*/gm, '')
   texto = texto.replace(/SET(|[\s]+)ANSI(|[\s]+|\_)NULLS(|[\s]+)(ON|OFF)|SET(|[\s]+)QUOTED(|[\s]+|\_)IDENTIFIER(|[\s]+)(ON|OFF)/gi, '')
-  texto = texto.replace(/with(|\s+|\n+|\s+\n+)\((|\s+|\n+|\s+\n+)(rowlock|nolock)(|\s+|\n+|\s+\n+)\)/mig, '')
+  texto = texto.replace(/(\s+|\n+|\s+\n+)with(|\s+|\n+|\s+\n+)\((|\s+|\n+|\s+\n+)(rowlock|nolock)(|\s+|\n+|\s+\n+)\)/mig, '')
   texto = texto.replace(/((?=[\ \t])|^\s+|$)+/mg, '')
   texto = texto.replace(/\t/mg, ' ')
   texto = texto.replace(/((?=\s(\@|\(|\=|\<|\>|\[|\]|\*|\.|\&|\,|\'|\-|\,\@|\]\(|\#|\=\@|\(\@|\/|\+|\s\w+\+|\w+)))|((?=\n)|\s)/gm, '')
@@ -72,7 +72,7 @@ function detectarCodificacion (archivo, contador2) {
   let codificacionInicial = ''
   codificacionInicial  = chardet.detectFileSync(archivo)
   console.log('Detectando codificacion del archivo No. ' + contador2 + ' -- Codificacion Inicial: ' + codificacionInicial)
-  if (codificarASCII(codificacionInicial)==true) {
+  if (codificarASCII(codificacionInicial) == true) {
     console.log('Se codificara en ASCII ')
     return 'ASCII'
   } else if (codificacionInicial == 'UTF-8') {
