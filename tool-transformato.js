@@ -64,8 +64,6 @@ function codificarASCII (codificacionInicial) {
   for(let i = 0; i < codificaciones.length; i++) {
     if (codificacionInicial == codificaciones[i]) {
       return true
-    } else {
-      return false
     }
   }
 }
@@ -74,7 +72,7 @@ function detectarCodificacion (archivo, contador2) {
   let codificacionInicial = ''
   codificacionInicial  = chardet.detectFileSync(archivo)
   console.log('Detectando codificacion del archivo No. ' + contador2 + ' -- Codificacion Inicial: ' + codificacionInicial)
-  if (codificacionInicial == 'ISO-8859-1' | codificacionInicial == 'ISO-8859-2' | codificacionInicial =='ISO-8859-3' | codificacionInicial =='ISO-8859-4' | codificacionInicial =='ISO-8859-5' | codificacionInicial =='ISO-8859-6' | codificacionInicial =='ISO-8859-7' | codificacionInicial =='ISO-8859-8' | codificacionInicial =='ISO-8859-9') {
+  if (codificarASCII(codificacionInicial)==true) {
     console.log('Se codificara en ASCII ')
     return 'ASCII'
   } else if (codificacionInicial == 'UTF-8') {
