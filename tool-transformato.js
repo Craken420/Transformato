@@ -2,11 +2,12 @@ const fs = require('fs')
 const path = require('path')
 const chardet = require('chardet')
 const Filequeue = require('filequeue')
+const iconvlite = require('iconv-lite')
 const fq = new Filequeue(1000)   // Maximo de numero de archivos abiertos a la vez
-//const carpeta= 'Archivos/'
-//const nuevaCarpeta= 'ArchivosNEW/'
-const carpeta = 'C:/Users/lapena/Documents/Luis Angel/Intelisis/SQL3100/'
-const nuevaCarpeta = 'C:/Users/lapena/Documents/Luis Angel/Intelisis/NuevoSQL3100/'
+const carpeta= 'Archivos/'
+const nuevaCarpeta= 'ArchivosNEW/'
+// const carpeta = 'C:/Users/lapena/Documents/Luis Angel/Intelisis/SQL3100/'
+// const nuevaCarpeta = 'C:/Users/lapena/Documents/Luis Angel/Intelisis/NuevoSQL3100/'
 const codificaciones = ['ISO-8859-1','ISO-8859-2','ISO-8859-3','ISO-8859-4','ISO-8859-5','ISO-8859-6','ISO-8859-7','ISO-8859-8','ISO-8859-9']
 let contador = 0
 
@@ -25,15 +26,7 @@ function comprobar (carpeta, archivos) {
 
 function leerArchivo (archivo, codificacionFinal) {
   contador = 0
-  let texto = ''
-  fq.readFile(archivo, codificacionFinal, function(err, data) {
-    if (err) {
-      console.log('error: ', err)
-    } else {
-      texto = data
-    }
-    remplazarTexto(archivo, texto, codificacionFinal)
-  })
+  remplazarTexto(archivo,  recodificar(archivo, codificacionFinal))
 }
 
 function transformar (texto) {
@@ -51,13 +44,19 @@ function transformar (texto) {
   return texto
 }
 
-function remplazarTexto (archivo, texto, codificacionFinal) {
-  fq.writeFile(nuevaCarpeta+archivo.replace(/(|.*?)(\\\w+)+\\|\w+\\/g, ''),  transformar(texto), { enconding : codificacionFinal }, function (err) {
+function remplazarTexto (archivo, texto) {
+  
+  fq.writeFile(archivo,  transformar(texto), function (err) {
     if (err) {
       return console.log(err)
     }
-    console.log(contador++ + '.- CODIFICACION ALMACENADA: ' + codificacionFinal + '  --  ' + archivo.replace(/(|.*?)(\\\w+)+\\|\w+\\/g, ''))
+    console.log(contador++ + '  --  ' + archivo.replace(/(|.*?)(\\\w+)+\\|\w+\\/g, ''))
   })
+  console.log('.- CODIFICACION ALMACENADA: ' +  chardet.detectFileSync(archivo))
+}
+
+function recodificar(archivo, recodificacion) {
+  return iconvlite.decode(fs.readFileSync(archivo), recodificacion)
 }
 
 function codificarASCII (codificacionInicial) {
