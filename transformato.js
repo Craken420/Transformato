@@ -2,12 +2,15 @@ const fs = require('fs')
 const path = require('path')
 const iconvlite = require('iconv-lite')
 const Filequeue = require('filequeue')
-const fq = new Filequeue(1000)   // Maximo de numero de archivos abiertos a la vez
-let contador = 0
+const fq = new Filequeue(1000) // Maximo de numero de archivos abiertos a la vez
+
+
 // const carpeta= 'Archivos\\'
 // const nuevaCarpeta= 'ArchivosNEW\\'
 const carpeta = 'C:\\Users\\lapena\\Documents\\Luis Angel\\Intelisis\\SQL3100\\'
 const nuevaCarpeta = 'C:\\Users\\lapena\\Documents\\Luis Angel\\Intelisis\\NuevoSQL3100\\'
+
+let contador = 0
 const recodificacion        = 'Latin1'
 
 const jsonRegEx = {
@@ -40,11 +43,37 @@ const jsonRegEx = {
   }
 }
 
+function comprobar (carpeta, archivos) {
+  contador = 0
+  let contador2 = 0
+  filtrarExtension(archivos).map(archivo => {
+
+    console.log(contador++ + ' .- Filtrando --', jsonRegEx.metodos.limpiarRuta(archivo))
+    return path.join(carpeta, archivo)
+
+  }).filter(archivo => {
+      return fs.statSync(archivo).isFile()
+
+  }).forEach(archivo => {
+
+    remplazarTexto (archivo, transformar(recodificar(archivo, recodificacion, contador2++)))
+  })
+}
+
+function filtrarExtension (archivos) {
+  return archivos.filter(archivo => /\.sql|\.vis|\.frm|\.esp|\.tbl|\.rep|\.dlg$/i.test(archivo))
+}
+
 function transformar (texto) {
   texto = jsonRegEx.metodos.limpiarComentarios(texto)
   texto = jsonRegEx.metodos.limpiarPoliticas(texto)
   texto = jsonRegEx.metodos.limpiarTexto(texto)
   return texto
+}
+
+function recodificar(archivo, recodificacion, contador2) {
+  console.log(contador2 + ' .- Recodificando --', jsonRegEx.metodos.limpiarRuta(archivo))
+  return iconvlite.decode(fs.readFileSync(archivo), recodificacion)
 }
 
 function remplazarTexto (archivo, texto) {
@@ -57,30 +86,8 @@ function remplazarTexto (archivo, texto) {
   })
 }
 
-
-function recodificar(archivo, recodificacion, contador2) {
-  console.log(contador2 + ' .- Recodificando --', jsonRegEx.metodos.limpiarRuta(archivo))
-  return iconvlite.decode(fs.readFileSync(archivo), recodificacion)
-}
-
-function filtrarExtension (archivos) {
-  return archivos.filter(archivo => /\.sql|\.vis|\.frm|\.esp|\.tbl|\.rep|\.dlg$/i.test(archivo))
-}
-
-function comprobar (carpeta, archivos) {
-  contador = 0
-  let contador2 = 0
-  filtrarExtension(archivos).map(archivo => {
-    console.log(contador++ + ' .- Filtrando --', jsonRegEx.metodos.limpiarRuta(archivo))
-      return path.join(carpeta, archivo)
-  }).filter(archivo => {
-      return fs.statSync(archivo).isFile()
-  }).forEach(archivo => {
-    remplazarTexto (archivo, transformar(recodificar(archivo, recodificacion, contador2++)))
-  })
-}
-
 fs.readdir(carpeta, (error, archivos) => {
   if (error) throw error
+
   comprobar(carpeta, archivos)
 })
