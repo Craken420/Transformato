@@ -11,7 +11,7 @@ const regEx  = require('./Utilerias/RegEx/jsonRgx')
 
 const carpeta = 'Archivos\\'
 
-function clsContenidoIntelisis (texto) {
+function clsContenidoBasura (texto) {
     texto = regEx.jsonReplace.clsComentariosSQL(texto)
     texto = regEx.jsonReplace.clsPoliticas(texto)
     texto = regEx.jsonReplace.clsTextoBasura(texto)
@@ -23,7 +23,7 @@ leerCarpeta.obtenerArchivos(carpeta)
         filtro.filtrarExtension(archivos).forEach(archivo => {
             pcrArchivos.crearArchivo(
                 'Testing\\'+ archivo.replace(regEx.expresiones.nomArchivoEnRuta, ''),
-                clsContenidoIntelisis(
+                clsContenidoBasura(
                     recodificar.extraerContenidoRecodificado(archivo)
                 )
             )
