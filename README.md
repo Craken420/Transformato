@@ -9,9 +9,13 @@ Instalar las dependencias
 
     npm i
 
-Cambiar a la rama UnirConsecutivo en el repositorio Utilerias
+Cambiar a la rama transformato en el repositorio Utilerias
 
     git checkout transformato
+    
+Crea la carpeta Testing
+
+    mkdir Testing
 
 Correr herramienta
 
