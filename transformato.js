@@ -8,9 +8,6 @@ const { leerCarpetaFiltrada } = require('./Utilerias/OperadoresArchivos/readDirO
 const regEx  = require('./Utilerias/RegEx/jsonRgx')
 const { detectarCodificacion } = require('./Utilerias/Codificacion/procesadorCodificacion')
 
-/*** Archivos ***/
-const { carpetas } = require('./Utilerias/Archivos/jsonCarpetas')
-
 const carpeta = 'Testing\\'
 
 const options = {
