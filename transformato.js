@@ -1,15 +1,13 @@
-/*** Archivos ***/
-const leerCarpeta = require('./Utilerias/OperadoresArchivos/leerCarpeta')
-
 /*** Operadores de archivos ***/
-const filtro = require('./Utilerias/OperadoresArchivos/filtrarArchivos')
 const pcrArchivos = require('./Utilerias/OperadoresArchivos/procesadorArchivos')
 const recodificar = require('./Utilerias/Codificacion/contenidoRecodificado')
+
+const { leerCarpetaFiltrada } = require('./Utilerias/OperadoresArchivos/readDirOnlyFile')
 
 /*** Operadores de cadena ***/
 const regEx  = require('./Utilerias/RegEx/jsonRgx')
 
-const carpeta = 'Archivos\\'
+const carpeta = 'Testing\\'
 
 function clsContenidoBasura (texto) {
     texto = regEx.Borrar.clsComentariosSQL(texto)
@@ -19,9 +17,9 @@ function clsContenidoBasura (texto) {
     return texto
 }
 
-leerCarpeta.obtenerArchivos(carpeta)
+leerCarpetaFiltrada(carpeta, ['.vis','.frm','.esp','.tbl','.rep','.dlg', '.sql'])
     .then(archivos => {
-        filtro.filtrarExtension(archivos).forEach(archivo => {
+        archivos.forEach(archivo => {
             pcrArchivos.crearArchivo(
                 'Testing\\'+ regEx.Borrar.clsRuta(archivo),
                 clsContenidoBasura(
