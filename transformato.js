@@ -23,10 +23,10 @@ const options = {
 async function replaceAsync (options) {
     try {
     const changes = await replac(options)
-    console.log('Modified files:', changes.join(', '));
+    console.log('Archivos modificados:', regEx.Borrar.clsRuta(changes.join(', ')))
     }
     catch (error) {
-    console.error('Error occurred:', error);
+    console.error('Error occurrido:', error);
     }
 }
 
