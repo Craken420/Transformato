@@ -1,33 +1,61 @@
-/*** Archivos ***/
-const leerCarpeta = require('./Utilerias/OperadoresArchivos/leerCarpeta')
 
-/*** Operadores de archivos ***/
-const filtro = require('./Utilerias/OperadoresArchivos/filtrarArchivos')
-const pcrArchivos = require('./Utilerias/OperadoresArchivos/procesadorArchivos')
-const recodificar = require('./Utilerias/Codificacion/contenidoRecodificado')
+const replac = require('replace-in-file');
+/*** Sub-modulos ***/
 
-/*** Operadores de cadena ***/
+/* Operadores de archivos */
+const { leerCarpetaFiltrada } = require('./Utilerias/OperadoresArchivos/readDirOnlyFile')
+
 const regEx  = require('./Utilerias/RegEx/jsonRgx')
+const { detectarCodificacion } = require('./Utilerias/Codificacion/procesadorCodificacion')
 
-const carpeta = 'Archivos\\'
+/*** Archivos ***/
+const { carpetas } = require('./Utilerias/Archivos/jsonCarpetas')
 
-function clsContenidoBasura (texto) {
-    texto = regEx.Borrar.clsComentariosSQL(texto)
-    texto = regEx.Borrar.clsEspacioEntrePalabras(texto)
-    texto = regEx.Borrar.clsPoliticas(texto)
-    texto = regEx.Borrar.clsTextoBasura(texto)
-    return texto
+const carpeta = 'Testing\\'
+
+const options = {
+    files: null,
+    from: null,
+    to: '',
+    encoding: '',
 }
 
-leerCarpeta.obtenerArchivos(carpeta)
+async function replaceAsync (options) {
+    try {
+    const changes = await replac(options)
+    console.log('Modified files:', changes.join(', '));
+    }
+    catch (error) {
+    console.error('Error occurred:', error);
+    }
+}
+
+function limpiar (archivo, codificacion) {
+    options.files = archivo
+    options.encoding = codificacion
+    options.from = [
+       regEx.Expresiones.comentarioSQLVacio,
+       regEx.Expresiones.comentarioSQLSencillo, 
+       regEx.Crear.comentarioSQLMedio(), 
+       regEx.Expresiones.comentarioSQLAvanzado, 
+       regEx.Expresiones.comentarioSQLDobleGuion,
+       regEx.Crear.ansis(),
+       regEx.Crear.witchNolock(),
+       regEx.Expresiones.saltoLineaVacio,
+       regEx.Expresiones.ampersand
+       //regEx.Crear.espaciosEntrePalabras(),
+   ]
+   options.to = ''
+
+   replaceAsync(options)
+
+   options.files = archivo
+   options.from = regEx.Expresiones.tabulador,
+   options.to = ' '
+   replaceAsync(options)
+}
+
+leerCarpetaFiltrada(carpeta, ['.sql','.vis','.frm','.esp','.tbl','.rep','.dlg'])
     .then(archivos => {
-        filtro.filtrarExtension(archivos).forEach(archivo => {
-            pcrArchivos.crearArchivo(
-                'Testing\\'+ regEx.Borrar.clsRuta(archivo),
-                clsContenidoBasura(
-                    recodificar.extraerContenidoRecodificado(archivo)
-                )
-            )
-        })
+        archivos.forEach(archivo => limpiar(archivo, (detectarCodificacion(archivo) == 'ISO-8859-1')  ? 'ascii' : detectarCodificacion(archivo)))
     })
-    .catch(e => console.error(e))

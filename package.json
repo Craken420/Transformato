@@ -15,6 +15,7 @@
     "fq": "^0.4.1",
     "fs": "0.0.1-security",
     "iconv-lite": "^0.4.24",
+    "replace-in-file": "^3.4.3",
     "util": "^0.11.1"
   }
 }
