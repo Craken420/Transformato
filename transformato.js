@@ -56,3 +56,4 @@ leerCarpetaFiltrada(carpeta, ['.sql','.vis','.frm','.esp','.tbl','.rep','.dlg'])
     .then(archivos => {
         archivos.forEach(archivo => limpiar(archivo, (detectarCodificacion(archivo) == 'ISO-8859-1')  ? 'ascii' : detectarCodificacion(archivo)))
     })
+
