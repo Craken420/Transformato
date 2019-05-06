@@ -28,6 +28,21 @@ const write = R.curry( (cod, pathFile) => {
     }
 })
 
+/*** ¡¡¡ For save in the original file !!! ***/
+
+// const write = R.curry( (cod, pathFile) => {
+//     fs.writeFileSync(
+//         pathFile, cleanContnt(
+//             DrkBx.mix.fls.recode(cod)(pathFile)
+//         ),
+//         cod
+//     )
+//     return {
+//         file: DrkBx.mix.cls.pthRoot(pathFile),
+//         status: true
+//     }
+// })
+
 const proccessFile = pathFile => {
     if ( path.extname(pathFile) == '.sql' ) { return write( 'utf16le' )( pathFile ) }
     else { return write( 'latin1' )( pathFile ) }
@@ -46,12 +61,12 @@ const dirRep = 'C:\\Users\\lapena\\Documents\\Luis Angel\\Sección Mavi\\Intelis
 const dirOrig = 'C:\\Users\\lapena\\Documents\\Luis Angel\\Sección Mavi\\Intelisis\\Intelisis5000\\Codigo Original\\'
 
 /* Folder and extentions of the files */
-// console.log(
-//     proccessDirFiles(
-//         ['.sql','.vis','.frm','.esp','.tbl','.rep','.dlg'],
-//         'Testing\\'
-//     )
-// )
+console.log(
+    proccessDirFiles(
+        ['.sql','.vis','.frm','.esp','.tbl','.rep','.dlg'],
+        'Testing\\'
+    )
+)
 
 /* Array of indicate files */
 // console.log(
