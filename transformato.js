@@ -12,10 +12,10 @@ const cleanContnt= R.pipe(
     DrkBx.mix.cls.tab,
     DrkBx.mix.cls.iniEndSpace,
     DrkBx.mix.cls.onlyOneSpace,
-    // DrkBx.intls.add.cmpEnterInHead
+    DrkBx.intls.add.cmpEnterInHead
 )
 
-const write = R.curry((cod, pathFile) => {
+const write = R.curry( (cod, pathFile) => {
     fs.writeFileSync(
         'Data\\' + DrkBx.mix.cls.pthRoot(pathFile), cleanContnt(
             DrkBx.mix.fls.recode(cod)(pathFile)
@@ -29,19 +29,46 @@ const write = R.curry((cod, pathFile) => {
 })
 
 const proccessFile = pathFile => {
-    if (path.extname(pathFile) == '.sql') {return write( /*DrkBx.mix.fls.dtcCod(pathFile)*/'utf16le' )( pathFile )}
-    else {return write( 'latin1' )( pathFile )}
+    if ( path.extname(pathFile) == '.sql' ) { return write( 'utf16le' )( pathFile ) }
+    else { return write( 'latin1' )( pathFile ) }
 }
 
-const proccessFiles = R.pipe(
+const proccessDirFiles = R.pipe(
+    DrkBx.mix.fls.getFiltFls,
     R.map(proccessFile)
 )
 
-/* Usage */
-const dir = 'Testing\\'
-const files = ['Testing\\dbo.AjusteAnual.StoredProcedure.sql']
-const file = 'Testing\\dbo.AjusteAnual.StoredProcedure.sql'
+const conctRootEsp = R.curry( (files, root) => R.map( file => root + file, files ) )
+const conctAndProcsFls = R.pipe( conctRootEsp, R.map(proccessFile) )
 
-console.log(proccessFiles(DrkBx.mix.fls.getFiltFls(['.sql','.vis','.frm','.esp','.tbl','.rep','.dlg'], dir)))
-// console.log(proccessFiles(files))
-// console.log(proccessFile(file))
+/* Usage */
+const dirRep = 'C:\\Users\\lapena\\Documents\\Luis Angel\\Sección Mavi\\Intelisis\\Intelisis5000\\Reportes MAVI\\'
+const dirOrig = 'C:\\Users\\lapena\\Documents\\Luis Angel\\Sección Mavi\\Intelisis\\Intelisis5000\\Codigo Original\\'
+
+/* Folder and extentions of the files */
+// console.log(
+//     proccessDirFiles(
+//         ['.sql','.vis','.frm','.esp','.tbl','.rep','.dlg'],
+//         'Testing\\'
+//     )
+// )
+
+/* Array of indicate files */
+// console.log(
+//     conctAndProcsFls([
+//         'dbo.ActClave.Table.sql',
+//         'dbo.AnexoCta.Table.sql',
+//         'dbo.AjusteAnual.StoredProcedure.sql',
+//         'AlmacenesVenta.frm'
+
+//     ], 'Testing\\')
+// )
+
+/* One file */
+// console.log(proccessFile('Testing\\dbo.AjusteAnual.StoredProcedure.sql'))
+
+module.exports.tranformato = {
+    conctRootAndProcsFls: conctAndProcsFls,
+    procsDirFiles: proccessDirFiles,
+    procsFile: proccessFile
+}
